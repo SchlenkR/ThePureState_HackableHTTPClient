@@ -1,5 +1,3 @@
-//   - Secrets are abstracted away in the Vault.
-// ----------------------------
 
 const express = require('express');
 const app = express();
