@@ -1,1 +1,1 @@
-# ThePureState_DotnetVSCodeRestClient
+# The Pure State: A Hackable HTTP Client
