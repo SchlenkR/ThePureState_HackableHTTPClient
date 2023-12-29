@@ -14,16 +14,14 @@ http {
     GET "https://localhost:5000/cities"
 }
 |> Request.send
+|> Response.deserializeJson<list<{| name: string; twoLetterIsoCountryCode: string |}>>
 
-let getJson age = $$""" { "name": "Ronald"; "age": {{age}} } """
 
 // dot-notation
 // (parenthesis mandatory for request definition)
-(
-    http {
+(http {
         GET "https://localhost:5000/cities"
-    }
-)
+    })
     .Send()
 
 
