@@ -101,29 +101,32 @@ const wellKnownRoles = {
 //   - Authorization is required for some endpoints.
 // ----------------------------
 
-app.get('/cities', (req, res) => {
-  const cityInfo = cities.map(city => ({
-    name: city.name,
-    twoLetterIsoCountryCode: city.twoLetterIsoCountryCode,
-  }));
-  res.json(cityInfo);
+app.get('/cities', (_req, res) => {
+  res.json(
+    cities.map(city => ({
+      name: city.name,
+      twoLetterIsoCountryCode: city.twoLetterIsoCountryCode,
+    }))
+  );
 });
 
 app.get(
   '/cities/:cityName/weather',
   requireRoles([wellKnownRoles.admin]),
   (req, res) => {
-    const cityName = req.params.cityName;
-    const city = cities.find(city => city.name === cityName);
+    // TODO: It's hard to refactor statements, here: early return.
+    // Better here: use expressions, more accurate:
+    // option<'t> and continuation + monad syntax
+    const city = cities.find(city => city.name === req.params.cityName);
     if (!city) {
       res.sendStatus(404);
       return;
     }
-    const weatherInfo = {
+
+    res.json({
       weather: city.weather,
       tempCelsius: city.tempCelsius,
-    };
-    res.json(weatherInfo);
+    });
   }
 );
 
@@ -131,21 +134,24 @@ app.put(
   '/cities/:cityName/weather',
   requireRoles([wellKnownRoles.admin]),
   (req, res) => {
-    const cityName = req.params.cityName;
-    const weatherInfo = req.body;
-    const city = cities.find(city => city.name === cityName);
+    // TODO: see comment above
+    const city = cities.find(city => city.name === req.params.cityName);
     if (!city) {
       res.sendStatus(404);
       return;
     }
 
-    cities = cities.filter(city => city.name !== cityName);
-    cities.push({
-      name: cityName,
-      twoLetterIsoCountryCode: city.twoLetterIsoCountryCode,
-      weather: weatherInfo.weather,
-      tempCelsius: weatherInfo.tempCelsius,
-    });
+    const weatherInfo = req.body;
+
+    cities
+      .filter(city => city.name !== cityName)
+      .push({
+        name: cityName,
+        twoLetterIsoCountryCode: city.twoLetterIsoCountryCode,
+        weather: weatherInfo.weather,
+        tempCelsius: weatherInfo.tempCelsius,
+      });
+
     res.sendStatus(204);
   }
 );
@@ -154,5 +160,4 @@ const listen = port => {
   app.listen(port, () => console.log(`Server is running on port ${port}`));
 };
 
-listen(5000);
-listen(6000);
+[5000, 6000].forEach(listen);

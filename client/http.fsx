@@ -62,3 +62,6 @@ Env.dev GET "cities" {
     AuthorizationBearer (Token.encode(Vault.secKey, Vault.issuer, "Ronald", [Roles.Premium]))
 }
 
+
+
+
