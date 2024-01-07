@@ -14,7 +14,7 @@ Source code for the video (TODO: Link).
 ## Running the backend
 
 ```bash
-cd ./backend/node
+cd backend
 npm install
 node app.js
 ```

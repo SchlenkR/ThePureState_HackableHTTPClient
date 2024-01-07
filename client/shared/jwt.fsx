@@ -13,7 +13,7 @@ let claimRights = ClaimTypes.Role
 let private createSecurityKey (key: string) = 
     SymmetricSecurityKey(Encoding.ASCII.GetBytes(key))
 
-let encode(key, issuer, userName, rights: seq<string>) =
+let encode key issuer userName (rights: seq<string>) =
     let tokenDescriptor =
         let utcNow = DateTime.UtcNow
         SecurityTokenDescriptor(
