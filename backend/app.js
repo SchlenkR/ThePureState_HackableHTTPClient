@@ -47,7 +47,13 @@ const wellKnownRoles = {
 //   - Roles might be required for some endpoints.
 // ----------------------------
 
-app.get('/cities', (_req, res) => res.json(Data.allCities));
+app.get(
+  '/cities', 
+  (_req, res) =>
+    {
+      return res.json(Data.allCities);
+    }
+);
 
 app.get(
   '/cities/:cityName',
@@ -62,15 +68,30 @@ app.get(
   }
 );
 
-app.get('/cities/:cityName/historicalWeather', (req, res) => {
-  const city = WeatherData.weather.find(x => x.city === req.params.cityName);
-  if (!city) {
-    res.sendStatus(404);
-    return;
-  }
+app.get(
+  '/cities/:cityName/historicalWeather', 
+  (req, res) => {
+    const city = WeatherData.weather.find(x => x.city === req.params.cityName);
+    if (!city) {
+      res.sendStatus(404);
+      return;
+    }
 
-  res.json(city.series);
+    res.json(city.series);
 });
+
+app.get(
+  '/cities/:cityName/currentConditions',
+  (req, res) => {
+    const city = Data.allCities.find(x => x.name === req.params.cityName);
+    if (!city) {
+      res.sendStatus(404);
+      return;
+    }
+
+    res.json(city.currentConditions);
+  }
+);
 
 app.put(
   '/cities/:cityName/currentConditions',
@@ -100,7 +121,7 @@ app.delete(
 
     Data.updateCities(Data.allCities.filter(x => x.name !== req.params.cityName));
     
-    res.json(Data.allCities);
+    res.sendStatus(204);
   }
 );
 

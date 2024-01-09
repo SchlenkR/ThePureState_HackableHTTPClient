@@ -7,24 +7,52 @@ open System
 open FsHttp
 open FsHttp.Operators
 
+// --------------------
+
+type AuthInfo = 
+    {
+        secKey: string
+        issuer: string
+    }
+
+type EnvInfo =
+    {
+        authInfo: AuthInfo
+        baseUrl: string
+    }
+
+let mkToken authInfo = 
+    Jwt.encode authInfo.secKey authInfo.issuer "Ronald" [ "admin" ]
+
+let httpEnv envInfo =
+    http {
+        config_transformHeader (fun header ->
+            let relativeUrl = header.target.address.Value
+            { header with target.address = Some (envInfo.baseUrl </> relativeUrl) }
+        )
+        AuthorizationBearer (mkToken envInfo.authInfo)
+    }
+
+module Envs =
+    let local = 
+        {
+            baseUrl = "http://localhost:5000"
+            authInfo = {
+                secKey = Vault.localEnv.secKey
+                issuer = Vault.localEnv.issuer 
+            }
+        }
+    let testing = 
+        {
+            baseUrl = "http://localhost:6000"
+            authInfo = {
+                secKey = Vault.testingEnv.secKey
+                issuer = Vault.testingEnv.issuer 
+            }
+        }
 
 // --------------------
 
-
-let httpAuth =
-    http {
-        AuthorizationBearer (
-            Jwt.encode
-                Vault.localEnv.secKey
-                Vault.localEnv.issuer
-                "Ronald"
-                [ "admin" ]
-        )
-        CacheControl "no-cache"
-    }
-
-
-httpAuth {
-    DELETE "http://localhost:5000/cities/frankfurt"
+% httpEnv Envs.testing {
+    DELETE "cities/paris"
 }
-

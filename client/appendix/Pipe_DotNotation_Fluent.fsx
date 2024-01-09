@@ -1,5 +1,6 @@
-#r "nuget: FsHttp,13.3.0"
+#r "nuget: FsHttp"
 
+open System
 open FsHttp
 
 
@@ -7,26 +8,34 @@ open FsHttp
 // Alternatives
 // ------------------------------
 
-
-// Pipeline syntax
-// (most idiomatic and understandable)
-http {
-    GET "https://localhost:5000/cities"
-}
-|> Request.send
-|> Response.deserializeJson<list<{| name: string; twoLetterIsoCountryCode: string |}>>
+open System.Collections.Generic
+open System.Linq
 
 
-// dot-notation
-// (parenthesis mandatory for request definition)
-(http {
-        GET "https://localhost:5000/cities"
-    })
-    .Send()
+type WeatherSample =
+    {
+        tempMin: float
+        tempMax: float
+        time: DateOnly
+    }
+
+let getHistoricalWeather (cityName: string) =
+    Http
+        .Get($"http://localhost:5000/cities/{cityName}/historicalWeather")
+        .Send()
+        .DeserializeJson<list<WeatherSample>>()
+
+let getYearWithBiggestTempDiff (series: IEnumerable<WeatherSample>) =
+    series
+        .GroupBy(fun x -> x.time.Year)
+        .Select(fun g ->
+            let min = g.MinBy(fun x -> x.tempMin)
+            let max = g.MaxBy(fun x -> x.tempMax)
+            let diff = max.tempMax - min.tempMin
+            {| year = g.Key; diff = diff |}
+        )
+        .MaxBy (fun x -> x.diff)
 
 
-// fluent syntax
-"https://localhost:5000/cities"
-    .Get()
-    .Send()
-
+let tmp1 = getHistoricalWeather("frankfurt")
+let res = getYearWithBiggestTempDiff(tmp1)

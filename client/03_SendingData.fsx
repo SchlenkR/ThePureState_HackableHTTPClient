@@ -7,36 +7,29 @@ open FsHttp.Operators
 // --------------------
 
 
-% http {
-    GET "http://localhost:5000/cities/frankfurt"
-}
-
-
-% http {
-    PUT "http://localhost:5000/cities/frankfurt/currentConditions"
-    body
-    json $$"""
-        {
-            "tempCelsius": 8.0,
-            "humidity": 0.5
-        }
-    """
-}
-
-
-// --------------------
-
-type CurrentConditions = 
+type CurrentConditions =
     {
         tempCelsius: float
         humidity: float
     }
 
-let updateConditions (city: string) (updateConditions: CurrentConditions) =
+let getCurrentConditions (cityName: string) =
     % http {
-        PUT $"http://localhost:5000/cities/{city}/currentConditions"
+        GET $"http://localhost:5000/cities/{cityName}/currentConditions"
+    }
+    |> Response.deserializeJson<CurrentConditions>
+
+let setCurrentConditions (cityName: string) (currentConditions: CurrentConditions) =
+    % http {
+        PUT $"http://localhost:5000/cities/{cityName}/currentConditions"
         body
-        jsonSerialize updateConditions
+        jsonSerialize currentConditions
     }
 
-updateConditions "frankfurt" { tempCelsius = 8.0; humidity = 0.5 }
+let updateTemperature (cityName: string) (newTemp: float) =
+    let currCond = getCurrentConditions cityName
+    let newCurrCond = { currCond with tempCelsius = newTemp }
+    setCurrentConditions cityName newCurrCond
+
+// Update temp of Frankfurt
+updateTemperature "frankfurt" 25.0

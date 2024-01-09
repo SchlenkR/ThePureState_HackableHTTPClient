@@ -1,8 +1,5 @@
 #r "nuget: FsHttp"
 
-#load "./shared/vault.fsx"
-#load "./shared/jwt.fsx"
-
 open System
 open FsHttp
 open FsHttp.Operators
@@ -10,14 +7,8 @@ open FsHttp.Operators
 
 // --------------------
 
-
-% http {
-    DELETE "http://localhost:5000/cities/frankfurt"
-}
-
-
-// --------------------
-
+#load "./shared/jwt.fsx"
+#load "./shared/vault.fsx"
 
 let mkToken () =
     Jwt.encode
@@ -32,3 +23,16 @@ let mkToken () =
     AuthorizationBearer (mkToken ())
 }
 
+% http {
+    GET "http://localhost:5000/cities"
+}
+
+
+let httpAuth () =
+    http {
+        AuthorizationBearer (mkToken ())
+    }
+
+% httpAuth () {
+    DELETE "http://localhost:5000/cities/paris"
+}
