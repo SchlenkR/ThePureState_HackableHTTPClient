@@ -47,16 +47,14 @@ const wellKnownRoles = {
 //   - Roles might be required for some endpoints.
 // ----------------------------
 
-app.get(
-  '/cities', 
+app.get('/cities', 
   (_req, res) =>
     {
       return res.json(Data.allCities);
     }
 );
 
-app.get(
-  '/cities/:cityName',
+app.get('/cities/:cityName',
   (req, res) => {
     const city = Data.allCities.find(x => x.name === req.params.cityName);
     if (!city) {
@@ -68,8 +66,7 @@ app.get(
   }
 );
 
-app.get(
-  '/cities/:cityName/historicalWeather', 
+app.get('/cities/:cityName/historicalWeather', 
   (req, res) => {
     const city = WeatherData.weather.find(x => x.city === req.params.cityName);
     if (!city) {
@@ -80,8 +77,7 @@ app.get(
     res.json(city.series);
 });
 
-app.get(
-  '/cities/:cityName/currentConditions',
+app.get('/cities/:cityName/currentConditions',
   (req, res) => {
     const city = Data.allCities.find(x => x.name === req.params.cityName);
     if (!city) {
@@ -93,8 +89,7 @@ app.get(
   }
 );
 
-app.put(
-  '/cities/:cityName/currentConditions',
+app.put('/cities/:cityName/currentConditions',
   (req, res) => {
     const city = Data.allCities.find(x => x.name === req.params.cityName);
     if (!city) {
@@ -109,8 +104,7 @@ app.put(
   }
 );
 
-app.delete(
-  '/cities/:cityName',
+app.delete('/cities/:cityName',
   requireRoles([wellKnownRoles.admin]),
   (req, res) => {
     const city = Data.allCities.find(x => x.name === req.params.cityName);
