@@ -56,11 +56,6 @@ let httpEnv envInfo =
 
 
 
-
-
-
-
-
 % httpEnv Envs.testing {
     DELETE "cities/paris"
 }

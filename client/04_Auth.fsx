@@ -21,27 +21,10 @@ let httpAuth () =
         AuthorizationBearer (mkToken ())
     }
 
+// --------------------
+
+
+
 % httpAuth () {
     DELETE "http://localhost:5000/cities/paris"
 }
-
-
-% http {
-    DELETE "http://localhost:5000/cities/frankfurt"
-    AuthorizationBearer (mkToken ())
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

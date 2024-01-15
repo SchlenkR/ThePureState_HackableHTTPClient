@@ -7,13 +7,8 @@ open FsHttp.Operators
 // --------------------
 
 
-% http {
-    GET "http://localhost:5000/cities"
-}
-
-
-
 // Task 1 - what was the biggest temperature difference in one year?
+
 let frankfurtHistoricalWeather =
     http {
         GET "http://localhost:5000/cities/frankfurt/historicalWeather"
@@ -37,5 +32,4 @@ frankfurtHistoricalWeather
     let diff = max.tempMax - min.tempMin
     {| year = year; diff = diff |}
 )
-|> List.maxBy _.diff
-
+|> List.maxBy (_.diff)
